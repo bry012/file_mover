@@ -84,6 +84,10 @@ class Program:
             for file in listOfFiles:
                 if file.startswith("."):
                     pass
+                elif os.path.isdir(src +"/" + file):
+                    new_src = src + "/" + file
+                    new_dst = dst + "/" + file
+                    evaluate_directory(new_src, new_dst,files_in_dst)
                 elif file.endswith(self.file_type) and not os.path.exists(dst + "/" + file):
                         if any(s.endswith(file) for s in self.files_list):
                             pass
@@ -92,10 +96,6 @@ class Program:
                         else:
                             self.files_list.append(src + "/" + file)
                             self.dst_list.append(dst)
-                elif os.path.isdir(src +"/" + file):
-                    new_src = src + "/" + file
-                    new_dst = dst + "/" + file
-                    evaluate_directory(new_src, new_dst,files_in_dst)
             print len(self.files_list)
             return len(self.files_list)
         
