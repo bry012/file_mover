@@ -30,7 +30,7 @@ class Program:
             end_path = self.files_list[files].split("/")
             file_name = end_path[-1]
             print "copying " + file_name
-            bryan.copied_files.insert(END, "copying" + file_name)
+            bryan.copied_files.insert(END, "copying %s" % file_name)
             bryan.copied_files.update()
             bryan.copied_files.see(END)
 
@@ -40,7 +40,7 @@ class Program:
 
 
             #copies files over to destination using shutil
-            shutil.copyfile(self.files_list[files], self.dst_list[files] + "/" + file_name)
+            shutil.copyfile(self.files_list[files], "%s/%s" % (self.dst_list[files],file_name))
             self.files_moved += 1
         
         return self.files_moved
@@ -84,11 +84,11 @@ class Program:
             for file in listOfFiles:
                 if file.startswith("."):
                     pass
-                elif os.path.isdir(src +"/" + file):
-                    new_src = src + "/" + file
-                    new_dst = dst + "/" + file
+                elif os.path.isdir("%s/%s" % (src,file)):
+                    new_src = "%s/%s" % (src,file)
+                    new_dst = "%s/%s" % (dst,file)
                     evaluate_directory(new_src, new_dst,files_in_dst)
-                elif file.endswith(self.file_type) and not os.path.exists(dst + "/" + file):
+                elif file.endswith(self.file_type) and not os.path.exists("%s/%s" % (dst,file)):
                         if any(s.endswith(file) for s in self.files_list):
                             pass
                         elif any(t.endswith(file) for t in files_in_dst):
@@ -99,8 +99,9 @@ class Program:
             print len(self.files_list)
             return len(self.files_list)
         
-        bryan.copied_files.insert(END,str(evaluate_directory(self.src, self.dst, files_in_dst)) + \
-         " files will be copied and moved. Would you like to remove from source, also?")
+        bryan.copied_files.insert(END,
+         "%d files will be copied and moved. Would you like to remove from source, also?" 
+         % (evaluate_directory(self.src, self.dst, files_in_dst)))
         
         #prevents multiple clear, remove, continue buttons from being created
         if self.run:
@@ -120,7 +121,7 @@ class Program:
 
         """initiates copying of files to new directory"""
 
-        bryan.copied_files.insert(END,str(self.move_music()) + " files were copied and moved to " + self.dst)
+        bryan.copied_files.insert(END,"%d files were copied and moved to %s" % (self.move_music(), self.dst))
         bryan.copied_files.see(END)
         bryan.continue_button.grid_remove()
         bryan.remove_button.grid_remove()
@@ -156,7 +157,7 @@ class Program:
         for files in range(0,len(self.files_list)):
             end_path = self.files_list[files].split("/")
             fil = end_path[-1]
-            bryan.copied_files.insert(END,"removing " + fil)
+            bryan.copied_files.insert(END,"removing %s" % fil)
             bryan.copied_files.update()
             bryan.copied_files.see(END)
             os.remove(self.files_list[files])
@@ -168,7 +169,7 @@ class Program:
                 os.removedirs(root)
             else:
                 pass
-        bryan.copied_files.insert(END,str(self.length) + " files were removed from "+ self.src)
+        bryan.copied_files.insert(END,"%d files were removed from %s" % (self.length, self.src))
         bryan.copied_files.see(END)
         self.files_list = []
         self.dst_list = []
@@ -241,11 +242,11 @@ class Window:
         """initiates scanning of source directory/ destination directory"""
 
         #prevents user input from being none
-        if self.file_src.get() == "":
+        if not self.file_src.get():
             self.file_src.insert(0,self.file_src_defs)
-        if self.file_dst.get() == "":
+        if not self.file_dst.get():
             self.file_dst.insert(0,self.file_dst_defs)
-        if self.file_type.get() == "":
+        if not self.file_type.get():
             self.file_type.insert(0, self.file_type_defs)
         move.files_list = []
         move.transfer_music()
