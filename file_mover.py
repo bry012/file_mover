@@ -17,33 +17,28 @@ class Program:
     src = ""
     dst = ""
     file_type = ""
+    type_list = []
 
     def move_music(self):
 
         """Copies files from source directory to destination directory"""
-
-        self.length = len(self.files_list)
-        
-        for files in range(0,self.length):
-
+        self.files_moved = len(self.files_list)
+        print self.files_moved
+        for files in self.files_list:
+            file_index = self.files_list.index(files)
             #removes complete path from file name
-            end_path = self.files_list[files].split("/")
-            file_name = end_path[-1]
-            print "copying " + file_name
+            (root,file_name) = os.path.split(files)
+            
             bryan.copied_files.insert(END, "copying %s" % file_name)
             bryan.copied_files.update()
             bryan.copied_files.see(END)
+            
+            if not os.path.exists(self.dst_list[file_index]): 
+                os.makedirs(self.dst_list[file_index])
 
-            #creates directories in destination if they do not exist
-            if not os.path.exists(self.dst_list[files]): 
-                os.makedirs(self.dst_list[files])
-
-
-            #copies files over to destination using shutil
-            shutil.copyfile(self.files_list[files], "%s/%s" % (self.dst_list[files],file_name))
-            self.files_moved += 1
-        
+            shutil.copyfile(files, "%s/%s" % (self.dst_list[file_index],file_name))
         return self.files_moved
+        
 
 
 
@@ -53,19 +48,21 @@ class Program:
             moved"""
         self.src = bryan.file_src.get()
         self.dst = bryan.file_dst.get()
-        self.file_type = bryan.file_type.get()
-        print self.src
-        print self.dst
+        self.type_list = bryan.file_type.get().split(",")
+         
         
-        #"walks" through destination directory and creates list of existing files
+        #"walks" through destination directory and creates list of existing files to prevent duplicates when 
+        #copying
         def walk():
             list1 = []
             list2 = []
             for root,dirs,files in os.walk(self.dst):
                 list1 += files
             for f in list1:
-                if f.endswith(self.file_type):
+                (files,extension) = os.path.splitext(f)
+                if extension in self.type_list:
                     list2.append(f)
+
             return list2
 
         files_in_dst = walk()
@@ -76,26 +73,28 @@ class Program:
             bryan.copied_files.update()
             return
 
-        #compiles list of files to be copied/removed and returns list of those files
+        #evaluates directory before copying/removing process begins to alert user of amount of files to be moved
         def evaluate_directory (src,dst,files_in_dst):
             
             listOfFiles = os.listdir(src)
 
             for file in listOfFiles:
+                (files,extension) = os.path.splitext(file)
                 if file.startswith("."):
                     pass
                 elif os.path.isdir("%s/%s" % (src,file)):
                     new_src = "%s/%s" % (src,file)
                     new_dst = "%s/%s" % (dst,file)
                     evaluate_directory(new_src, new_dst,files_in_dst)
-                elif file.endswith(self.file_type) and not os.path.exists("%s/%s" % (dst,file)):
+                elif extension in self.type_list and not os.path.exists("%s/%s" % (dst,file)):
                         if any(s.endswith(file) for s in self.files_list):
                             pass
                         elif any(t.endswith(file) for t in files_in_dst):
                             pass
                         else:
-                            self.files_list.append(src + "/" + file)
+                            self.files_list.append("%s/%s" % (src,file))
                             self.dst_list.append(dst)
+    
             print len(self.files_list)
             return len(self.files_list)
         
@@ -120,7 +119,7 @@ class Program:
     def continues(self,removed = False):
 
         """initiates copying of files to new directory"""
-
+        for x in self.files_list: print x
         bryan.copied_files.insert(END,"%d files were copied and moved to %s" % (self.move_music(), self.dst))
         bryan.copied_files.see(END)
         bryan.continue_button.grid_remove()
@@ -130,9 +129,7 @@ class Program:
             self.run = False
             self.files_list = []
             self.dst_list = []
-            self.files_moved = 0
     
-       
     def clear(self):
 
         """clears listbox"""
@@ -152,15 +149,14 @@ class Program:
         bryan.remove_button.grid_remove()
         bryan.continue_button.grid_remove()
         self.continues(True)
-        print "hello"
+        
         #writes file names to listbox and removes files from source
-        for files in range(0,len(self.files_list)):
-            end_path = self.files_list[files].split("/")
-            fil = end_path[-1]
+        for files in self.files_list:
+            (root,fil) = os.path.split(files)
             bryan.copied_files.insert(END,"removing %s" % fil)
             bryan.copied_files.update()
             bryan.copied_files.see(END)
-            os.remove(self.files_list[files])
+            os.remove(files)
 
         #removes directory(folder) if directory contains no files
         for root,dirs,files in os.walk(self.src):
@@ -169,11 +165,10 @@ class Program:
                 os.removedirs(root)
             else:
                 pass
-        bryan.copied_files.insert(END,"%d files were removed from %s" % (self.length, self.src))
+        bryan.copied_files.insert(END,"%d files were removed from %s" % (self.files_moved, self.src))
         bryan.copied_files.see(END)
         self.files_list = []
         self.dst_list = []
-        self.files_moved = 0
         self.run = False
 
 class Window:
