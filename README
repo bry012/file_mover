@@ -1,1 +1,14 @@
 Documentation
+
+FILE MOVER
+
+This relatively simple python program easily moves multiple selected file types
+from and to diretories of choice. Features include simple copy along with copy+remove 
+copied files from source directory. Multiple file types can be selected by separating 
+each file type with a comma ",".
+
+Installation:
+
+currently no .exe exists for this program but source code can be used if python and 
+tkinter are installed on your machine. (Only tested on linux)
+
