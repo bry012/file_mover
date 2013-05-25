@@ -214,22 +214,30 @@ class Window:
         con = lite.connect('file_mover.db')
         with con:
             cur = con.cursor()
+            cur.execute("CREATE TABLE IF NOT EXISTS Settings(id INT, src_def TEXT, dst_def TEXT, type_def TEXT)")
             cur.execute("SELECT * FROM Settings")
-            sets = cur.fetchall() 
-            self.file_src_defs = sets[0][1]
-            self.file_dst_defs = sets[0][2]
-            self.file_type_defs = sets[0][3] 
-              
-            self.file_src.delete(0,END)
-            self.file_dst.delete(0,END)
-            self.file_type.delete(0,END)
-            self.file_src.insert(0, self.file_src_defs)
-            self.file_dst.insert(0, self.file_dst_defs) 
-            self.file_type.insert(0, self.file_type_defs)
+            sets = cur.fetchall()
+            if len(sets) > 0: 
+                self.file_src_defs = sets[0][1]
+                self.file_dst_defs = sets[0][2]
+                self.file_type_defs = sets[0][3] 
+                  
+                self.file_src.delete(0,END)
+                self.file_dst.delete(0,END)
+                self.file_type.delete(0,END)
+                self.file_src.insert(0, self.file_src_defs)
+                self.file_dst.insert(0, self.file_dst_defs) 
+                self.file_type.insert(0, self.file_type_defs)
 
-            self.file_src.update()
-            self.file_dst.update()
-            self.file_type.update()
+                self.file_src.update()
+                self.file_dst.update()
+                self.file_type.update()
+
+            else:
+                self.file_src_defs = "/source/default/path"
+                self.file_dst_defs = "/destination/default/path"
+                self.file_type_defs = ".file_type,.default"
+
     
 
     def submit_button(self):
