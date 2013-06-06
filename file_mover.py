@@ -23,7 +23,6 @@ class Program:
 
         """Copies files from source directory to destination directory"""
         self.files_moved = len(self.files_list)
-        print self.files_moved
         for files in self.files_list:
             file_index = self.files_list.index(files)
             #removes complete path from file name
