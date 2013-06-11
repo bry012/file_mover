@@ -83,5 +83,9 @@ def check_for_duplicates(src_list,dst_list):
         for files_in_dst in dst_list:
             (roots,file_names) = os.path.split(files_in_dst)
             if file_names == file_name:
-                src_files.remove(files)
+                print files in src_files
+                try:
+                    src_files.remove(files)
+                except:
+                    print files
     return src_files
