@@ -38,23 +38,31 @@ class Program:
         return self.files_moved
         
     def transfer_music(self):
-        from copy import walk_dir,get_size
+        from copy import walk_dir,get_size,check_for_duplicates
         self.exclusion_list = []
         self.type_list = []
         """scans source and destination directories for duplicates, directory existence and number of files to be
             moved"""
         self.src = bryan.file_src.get()
         self.dst = bryan.file_dst.get()
+        
+        #splits input entered in file_type box by ",".
         self.type_list = bryan.file_type.get().split(",")
+        
+        #iterates through type_list to append file types that are to be excluded to the exclusion list
         for types in self.type_list:
             if types.startswith("-"):
                 file_type = types[1::]
                 self.exclusion_list.append(file_type)
 
-        files_and_size = walk_dir(self.src,self.type_list,self.exclusion_list)
-        self.files_list = files_and_size[0]
+        #walks source directory and destination directory, checks for duplicate files and assigns a list without
+        #duplicates to files_in_source
+        files_in_source = check_for_duplicates(walk_dir(self.src,self.type_list,self.exclusion_list),\
+                                               walk_dir(self.dst,self.type_list,self.exclusion_list))
+        self.files_list = files_in_source
+        
         bryan.copied_files.insert(END,"%d files, %s will be copied and moved."
-         % (len(self.files_list),get_size(files_and_size[1])))
+         % (len(self.files_list),get_size(files_in_source)))
         bryan.copied_files.insert(END,"Would you like to remove from source, also?") 
         #prevents multiple clear, remove, continue buttons from being created
         if self.run:
@@ -73,7 +81,7 @@ class Program:
     def continues(self,removed = False):
 
         """initiates copying of files to new directory"""
-        for x in self.files_list: print x
+        #for x in self.files_list: print x
         bryan.copied_files.insert(END,"%d files were copied and moved to %s" % (self.move_music(), self.dst))
         bryan.copied_files.see(END)
         bryan.continue_button.grid_remove()
