@@ -208,7 +208,7 @@ class Window:
     
     def create(self):
 
-        """constructs main file mover window. Self is only command"""
+        """constructs main file mover window. Self is only argument"""
 
         self.submit.config(command = self.submit_button,fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
         self.clear_button.config(bg="black",fg="#33CCCC", command = move.clear,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
