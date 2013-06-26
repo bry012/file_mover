@@ -11,7 +11,7 @@ ex.
 .mp3,.m4a,.jpg  - all files with these extensions will be included
 -.mp3,-.m4a,-.jpg - all files with these extensions will be excluded
 
-This program also creates a database on the user's maching 
+This program also creates a database on the user's machine
 named "file_mover.db.
 
 Version info:
