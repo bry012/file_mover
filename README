@@ -8,8 +8,8 @@ copied files from source directory. Multiple file types can be selected by separ
 each file type with a comma ",". File types can be excluded by preceding a file type with a "-".
 
 ex.
-<code> .mp3,.m4a,.jpg </code>  - all files with these extensions will be included
-<code> .mp3,-.m4a,-.jpg </code> - all files with these extensions will be excluded
+.mp3,.m4a,.jpg   - all files with these extensions will be included
+.mp3,-.m4a,-.jpg  - all files with these extensions will be excluded
 
 This program also creates a database on the user's machine
 named "file_mover.db.
