@@ -4,9 +4,10 @@
 from Tkinter import * 
 import tkFileDialog
 root = Tk() 
-import os, os.path,shutil
-import sqlite3 as lite
+import os, os.path, shutil
+import sqlite3 #becuase we are using cx_freeze 
 import sys
+import copy 
 
 class Program:
     def __init__(self):
@@ -40,7 +41,6 @@ class Program:
         return self.files_moved
         
     def transfer_music(self):
-        from copy import walk_dir,get_size,check_for_duplicates
         self.exclusion_list = []
         self.type_list = []
         """scans source and destination directories for duplicates, directory existence and number of files to be
@@ -59,20 +59,18 @@ class Program:
 
         #walks source directory and destination directory, checks for duplicate files and assigns a list without
         #duplicates to files_in_source
-        files_in_source = check_for_duplicates(walk_dir(self.src,self.type_list,self.exclusion_list),\
-                                               walk_dir(self.dst,self.type_list,self.exclusion_list))
+        files_in_source = copy.check_for_duplicates(copy.walk_dir(self.src,self.type_list,self.exclusion_list),\
+                                               copy.walk_dir(self.dst,self.type_list,self.exclusion_list), bryan.copied_files,END)
         self.files_list = files_in_source
         
         #inform the user that file exist and exit the program
         if (len(self.files_list) != 0):
             bryan.copied_files.insert(END,"%d files, %s will be copied and moved."
-             % (len(self.files_list),get_size(files_in_source)))
+             % (len(self.files_list),copy.get_size(files_in_source)))
             bryan.copied_files.insert(END,"Would you like to remove from source, also?") 
             #prevents multiple clear, remove, continue buttons from being created
         else:
-            bryan.copied_files.insert(END,'file exist in destination')
-            return
-
+            return 
         if self.run:
             return
 
@@ -165,12 +163,12 @@ class Window:
 
     def defaults(self,second_run=True):
 
-        """Pulls default source, destination and file type from sqlite3 database"""
+        """Pulls default source, destination and file type from sqsqlite33 database"""
 
         if second_run:
             self.defaults_window()
 
-        con = lite.connect('file_mover.db')
+        con = sqlite3.connect('file_mover.db')
         with con:
             cur = con.cursor()
             cur.execute("CREATE TABLE IF NOT EXISTS Settings(id INT, src_def TEXT, dst_def TEXT, type_def TEXT)")
@@ -268,13 +266,13 @@ class Window:
     
     def save(self):
 
-        """saves default source and destination directories along with file type to sqlite database 'Settings'"""
+        """saves default source and destination directories along with file type to sqsqlite3 database 'Settings'"""
 
         settings = (
             (1,self.file_src_def.get(),self.file_dst_def.get(),self.file_type_def.get())
             )
 
-        con = lite.connect('file_mover.db')
+        con = sqlite3.connect('file_mover.db')
         
         with con:
             cur = con.cursor()    
