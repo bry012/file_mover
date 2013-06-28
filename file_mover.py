@@ -2,23 +2,25 @@
 # -*- coding: utf-8 -*-
 
 from Tkinter import * 
+import tkFileDialog
 root = Tk() 
 import os, os.path,shutil
 import sqlite3 as lite
 import sys
 
 class Program:
-    run = False
-    cleared = True
-    files_moved = 0
-    files_list = []
-    dst_list = []
-    length = 0
-    src = ""
-    dst = ""
-    file_type = ""
-    type_list = []
-    exclusion_list = []
+    def __init__(self):
+        self.run = False
+        self.cleared = True
+        self.files_moved = 0
+        self.files_list = []
+        self.dst_list = []
+        self.length = 0
+        self.src = ""
+        self.dst = ""
+        self.file_type = ""
+        self.type_list = []
+        self.exclusion_list = []
     def move_music(self):
 
         """Copies files from source directory to destination directory"""
@@ -61,10 +63,16 @@ class Program:
                                                walk_dir(self.dst,self.type_list,self.exclusion_list))
         self.files_list = files_in_source
         
-        bryan.copied_files.insert(END,"%d files, %s will be copied and moved."
-         % (len(self.files_list),get_size(files_in_source)))
-        bryan.copied_files.insert(END,"Would you like to remove from source, also?") 
-        #prevents multiple clear, remove, continue buttons from being created
+        #inform the user that file exist and exit the program
+        if (len(self.files_list) != 0):
+            bryan.copied_files.insert(END,"%d files, %s will be copied and moved."
+             % (len(self.files_list),get_size(files_in_source)))
+            bryan.copied_files.insert(END,"Would you like to remove from source, also?") 
+            #prevents multiple clear, remove, continue buttons from being created
+        else:
+            bryan.copied_files.insert(END,'file exist in destination')
+            return
+
         if self.run:
             return
 
@@ -137,6 +145,8 @@ class Window:
     menubar = Menu(root)
     filemenu = Menu(menubar, tearoff=0)
     submit = Button(buttonframe, text="Submit") 
+    open_ = Button(srcframe, text='Open')#me
+    open1_ = Button(srcframe, text='Open')#me
     clear_button = Button(buttonframe,text="clear")
     continue_button = Button(buttonframe, text="copy")
     remove_button = Button(buttonframe, text="remove+copy")
@@ -183,9 +193,9 @@ class Window:
                 self.file_type.update()
 
             else:
-                self.file_src_defs = "/source/default/path"
-                self.file_dst_defs = "/destination/default/path"
-                self.file_type_defs = ".file_type,.default"
+                self.file_src_defs = "insert a source path"
+                self.file_dst_defs = "insert a destination path"
+                self.file_type_defs = "insert a file type"
 
     
 
@@ -194,18 +204,25 @@ class Window:
         """initiates scanning of source directory/ destination directory"""
 
         #prevents user input from being none
+        #prevents programing from running if no input
         if not self.file_src.get():
             self.file_src.insert(0,self.file_src_defs)
-        if not self.file_dst.get():
+        elif not self.file_dst.get():
             self.file_dst.insert(0,self.file_dst_defs)
-        if not self.file_type.get():
+        elif not self.file_type.get():
             self.file_type.insert(0, self.file_type_defs)
-        move.files_list = []
-        move.exclusion_list = []
-        move
-        move.transfer_music()
+        else:
+            move.files_list = []
+            move.exclusion_list = []
+            move
+            move.transfer_music()
 
-    
+    #give user the opportunity to select a folder 
+    def getDirSrc(self):
+        self.file_src.insert(0, tkFileDialog.askdirectory(parent=root, title='Select a folder'))
+    def getDirDst(self):
+        self.file_dst.insert(0, tkFileDialog.askdirectory(parent=root, title='Select a folder'))
+
     def create(self):
 
         """constructs main file mover window. Self is only argument"""
@@ -228,6 +245,13 @@ class Window:
         self.file_dst.grid(row=1,column=1,sticky=W+E)
         self.file_type.grid(row=2,column=1,sticky=W+E)
         self.submit.grid(row=0,sticky=W)
+
+        # get folder buttons 
+        self.open_.config(command = self.getDirSrc,fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
+        self.open1_.config(command = self.getDirDst,fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
+        self.open_.grid(row=0,column=2,sticky=W)
+        self.open1_.grid(row=1,column=2,sticky=W)
+       
         self.file_src.config(highlightbackground="#33CCCC",width=52)
         self.file_dst.config(highlightbackground="#33CCCC")
         self.file_type.config(highlightbackground="#33CCCC") 
