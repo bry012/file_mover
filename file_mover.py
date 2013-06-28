@@ -29,9 +29,9 @@ class Program:
             dst_path = files.replace(self.src,self.dst)
             (root,file_name) = os.path.split(files)
             (dst_root,dst_file) = os.path.split(dst_path)
-            bryan.copied_files.insert(END, "copying %s" % file_name)
-            bryan.copied_files.update()
-            bryan.copied_files.see(END)
+            GUI.copied_files.insert(END, "copying %s" % file_name)
+            GUI.copied_files.update()
+            GUI.copied_files.see(END)
             
             if not os.path.exists(dst_root): 
                 os.makedirs(dst_root)
@@ -45,17 +45,17 @@ class Program:
         self.type_list = []
         """scans source and destination directories for duplicates, directory existence and number of files to be
             moved"""
-        self.src = bryan.file_src.get()
-        self.dst = bryan.file_dst.get()
+        self.src = GUI.file_src.get()
+        self.dst = GUI.file_dst.get()
         
         if not os.path.exists(self.src):
-            bryan.copied_files.insert(END,"The source directory doesn't exist.")
+            GUI.copied_files.insert(END,"The source directory doesn't exist.")
         
         else: 
             if not os.path.exists(self.dst):
-                   bryan.copied_files.insert(END,"The destination directory doesn't exist. A directory will be created upon copying.")
+                   GUI.copied_files.insert(END,"The destination directory doesn't exist. A directory will be created upon copying.")
             #splits input entered in file_type box by ",".
-            self.type_list = bryan.file_type.get().split(",")
+            self.type_list = GUI.file_type.get().split(",")
             
             #iterates through type_list to append file types that are to be excluded to the exclusion list
             for types in self.type_list:
@@ -71,12 +71,12 @@ class Program:
             
             #inform the user that file exist and exit the program
             if (len(self.files_list) != 0):
-                bryan.copied_files.insert(END,"%d files, %s will be copied and moved."
+                GUI.copied_files.insert(END,"%d files, %s will be copied and moved."
                  % (len(self.files_list),get_size(files_in_source)))
-                bryan.copied_files.insert(END,"Would you like to remove from source, also?") 
+                GUI.copied_files.insert(END,"Would you like to remove from source, also?") 
                 #prevents multiple clear, remove, continue buttons from being created
             else:
-                bryan.copied_files.insert(END,'Files already exist in destination.')
+                GUI.copied_files.insert(END,'Files already exist in destination.')
                 return
 
             if self.run:
@@ -84,10 +84,10 @@ class Program:
 
             #checks if listbox is cleared. If not cleared, creates clear button 
             if self.cleared:
-                bryan.clear_button.grid(row=0,column=1,sticky=W)
+                GUI.clear_button.grid(row=0,column=1,sticky=W)
 
-            bryan.continue_button.grid(row=0,column=2,sticky=W)
-            bryan.remove_button.grid(row=0,column=3,sticky=W)
+            GUI.continue_button.grid(row=0,column=2,sticky=W)
+            GUI.remove_button.grid(row=0,column=3,sticky=W)
             self.run = True
             self.cleared = False
 
@@ -96,10 +96,10 @@ class Program:
 
         """initiates copying of files to new directory"""
 
-        bryan.copied_files.insert(END,"%d files were copied and moved to %s" % (self.move_music(), self.dst))
-        bryan.copied_files.see(END)
-        bryan.continue_button.grid_remove()
-        bryan.remove_button.grid_remove()
+        GUI.copied_files.insert(END,"%d files were copied and moved to %s" % (self.move_music(), self.dst))
+        GUI.copied_files.see(END)
+        GUI.continue_button.grid_remove()
+        GUI.remove_button.grid_remove()
         
         if not removed:
             self.run = False
@@ -110,10 +110,10 @@ class Program:
 
         """clears listbox"""
 
-        bryan.copied_files.delete(0,END)
-        bryan.clear_button.grid_remove()
-        bryan.continue_button.grid_remove()
-        bryan.remove_button.grid_remove()
+        GUI.copied_files.delete(0,END)
+        GUI.clear_button.grid_remove()
+        GUI.continue_button.grid_remove()
+        GUI.remove_button.grid_remove()
         self.run = False
         self.cleared = True
 
@@ -122,14 +122,14 @@ class Program:
         from copy import remove_files
         """initiates copying of files to new directory and deletion of copied files from source directory"""
 
-        bryan.remove_button.grid_remove()
-        bryan.continue_button.grid_remove()
+        GUI.remove_button.grid_remove()
+        GUI.continue_button.grid_remove()
         self.continues(True)
         
         remove_files(self.files_list)
 
-        bryan.copied_files.insert(END,"%d files were removed from %s" % (self.files_moved, self.src))
-        bryan.copied_files.see(END)
+        GUI.copied_files.insert(END,"%d files were removed from %s" % (self.files_moved, self.src))
+        GUI.copied_files.see(END)
         self.files_list = []
         self.dst_list = []
         self.run = False
@@ -225,9 +225,9 @@ class Window:
             self.file_type.insert(0, self.file_type_defs)
             empty = True
         if not empty:
-            move.files_list = []
-            move.exclusion_list = []
-            move.transfer_music()
+            file_mover.files_list = []
+            file_mover.exclusion_list = []
+            file_mover.transfer_music()
 
     #give user the opportunity to select a folder 
     def getDirSrc(self,file_src):
@@ -242,9 +242,9 @@ class Window:
         """constructs main file mover window. Self is only argument"""
 
         self.submit.config(command = self.submit_button,fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
-        self.clear_button.config(bg="black",fg="#33CCCC", command = move.clear,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
-        self.continue_button.config(bg="black",fg="#33CCCC",  command = move.continues,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
-        self.remove_button.config(bg="black",fg="#33CCCC",  command = move.remove,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
+        self.clear_button.config(bg="black",fg="#33CCCC", command = file_mover.clear,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
+        self.continue_button.config(bg="black",fg="#33CCCC",  command = file_mover.continues,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
+        self.remove_button.config(bg="black",fg="#33CCCC",  command = file_mover.remove,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
         self.filemenu.add_command(label="Defaults", command=self.defaults)
         self.filemenu.config(fg="#33CCCC", bg="black",activebackground="#33CCCC",activeforeground="white")
         self.menubar.add_cascade(label="Settings", menu=self.filemenu)
@@ -323,7 +323,7 @@ class Window:
         self.file_dst_def.insert(0, self.file_dst_defs)
         self.file_type_def.insert(0, self.file_type_defs) 
 
-bryan = Window()
-move = Program()
-bryan.defaults(False)
-bryan.create()
+GUI = Window()
+file_mover = Program()
+GUI.defaults(False)
+GUI.create()
