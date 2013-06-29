@@ -1,6 +1,8 @@
-Documentation
 
 FILE MOVER
+
+Github Page:
+http://bry012.github.io/file_mover/
 
 This relatively simple python program easily moves multiple selected file types
 from and to directories of choice. Features include simple copy along with copy+remove 
@@ -27,5 +29,7 @@ bin folder contains .exe for windows. simply click file_mover.exe to lunch progr
 Tested OS:
 -Linux
 -Windows
+
+Please push all commits to the beta branch. Thank you.
 
 
