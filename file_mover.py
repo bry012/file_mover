@@ -4,9 +4,10 @@
 from Tkinter import * 
 import tkFileDialog
 root = Tk() 
-import os, os.path,shutil
-import sqlite3 as lite
+import os, os.path, shutil
+import sqlite3 #becuase we are using cx_freeze 
 import sys
+import copy 
 
 class Program:
     def __init__(self):
@@ -40,7 +41,6 @@ class Program:
         return self.files_moved
         
     def transfer_music(self):
-        from copy import walk_dir,get_size,check_for_duplicates
         self.exclusion_list = []
         self.type_list = []
         """scans source and destination directories for duplicates, directory existence and number of files to be
@@ -51,6 +51,7 @@ class Program:
         if not os.path.exists(self.src):
             GUI.copied_files.insert(END,"The source directory doesn't exist.")
         
+
         else: 
             if not os.path.exists(self.dst):
                    GUI.copied_files.insert(END,"The destination directory doesn't exist. A directory will be created upon copying.")
@@ -65,14 +66,14 @@ class Program:
 
             #walks source directory and destination directory, checks for duplicate files and assigns a list without
             #duplicates to files_in_source
-            files_in_source = check_for_duplicates(walk_dir(self.src,self.type_list,self.exclusion_list),\
-                                                   walk_dir(self.dst,self.type_list,self.exclusion_list))
+            files_in_source = copy.check_for_duplicates(copy.walk_dir(self.src,self.type_list,self.exclusion_list),\
+                                                   copy.walk_dir(self.dst,self.type_list,self.exclusion_list),GUI.copied_files,END)
             self.files_list = files_in_source
             
             #inform the user that file exist and exit the program
             if (len(self.files_list) != 0):
                 GUI.copied_files.insert(END,"%d files, %s will be copied and moved."
-                 % (len(self.files_list),get_size(files_in_source)))
+                 % (len(self.files_list),copy.get_size(files_in_source)))
                 GUI.copied_files.insert(END,"Would you like to remove from source, also?") 
                 #prevents multiple clear, remove, continue buttons from being created
             else:
@@ -91,6 +92,23 @@ class Program:
             self.run = True
             self.cleared = False
 
+        #iterates through type_list to append file types that are to be excluded to the exclusion list
+        for types in self.type_list:
+            if types.startswith("-"):
+                file_type = types[1::]
+                self.exclusion_list.append(file_type)
+
+        if self.run:
+            return
+
+        #checks if listbox is cleared. If not cleared, creates clear button 
+        if self.cleared:
+            GUI.clear_button.grid(row=0,column=1,sticky=W)
+
+        GUI.continue_button.grid(row=0,column=2,sticky=W)
+        GUI.remove_button.grid(row=0,column=3,sticky=W)
+        self.run = True
+        self.cleared = False
     
     def continues(self,removed = False):
 
@@ -174,12 +192,12 @@ class Window:
 
     def defaults(self,second_run=True):
 
-        """Pulls default source, destination and file type from sqlite3 database"""
+        """Pulls default source, destination and file type from sqsqlite33 database"""
 
         if second_run:
             self.defaults_window()
 
-        con = lite.connect('file_mover.db')
+        con = sqlite3.connect('file_mover.db')
         with con:
             cur = con.cursor()
             cur.execute("CREATE TABLE IF NOT EXISTS Settings(id INT, src_def TEXT, dst_def TEXT, type_def TEXT)")
@@ -282,13 +300,13 @@ class Window:
     
     def save(self):
 
-        """saves default source and destination directories along with file type to sqlite database 'Settings'"""
+        """saves default source and destination directories along with file type to sqsqlite3 database 'Settings'"""
 
         settings = (
             (1,self.file_src_def.get(),self.file_dst_def.get(),self.file_type_def.get())
             )
 
-        con = lite.connect('file_mover.db')
+        con = sqlite3.connect('file_mover.db')
         
         with con:
             cur = con.cursor()    

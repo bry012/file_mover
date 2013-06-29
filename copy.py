@@ -75,14 +75,17 @@ def get_size(files_list):
     
     return  "%0.2f %s and %0.2f %s" % (B, ending, iB, ending2)
 
-def check_for_duplicates(src_list,dst_list):
+def check_for_duplicates(src_list,dst_list,guiObject,END):
     """Sorts through two lists of files and creates new list without duplicates"""
     src_files = list(src_list)
+    #naming is confussing 
     for files in src_list:
-        (root,file_name) = os.path.split(files)
+        (srcRoot,srcFile_name) = os.path.split(files)
         for files_in_dst in dst_list:
-            (roots,file_names) = os.path.split(files_in_dst)
-            if file_names == file_name:
+            (dstRoot,dstFile_name) = os.path.split(files_in_dst)
+            if dstFile_name == srcFile_name:
+                #informs user of duplicate file 
+                guiObject.insert(END,'%s exists in destination'%srcFile_name)
                 print files in src_files
                 try:
                     src_files.remove(files)
