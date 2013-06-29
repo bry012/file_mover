@@ -3,13 +3,16 @@ Documentation
 FILE MOVER
 
 This relatively simple python program easily moves multiple selected file types
-from and to diretories of choice. Features include simple copy along with copy+remove 
+from and to directories of choice. Features include simple copy along with copy+remove 
 copied files from source directory. Multiple file types can be selected by separating 
 each file type with a comma ",". File types can be excluded by preceding a file type with a "-".
 
 ex.
-.mp3,.m4a,.jpg   - all files with these extensions will be included
--.mp3,-.m4a,-.jpg  - all files with these extensions will be excluded
+
+.mp3,.m4a,.jpg  - all files with these extensions will be included
+
+-.mp3,-.m4a,-.jpg - all files with these extensions will be excluded
+
 
 This program also creates a database on the user's machine
 named "file_mover.db.
@@ -19,8 +22,7 @@ v. 0.8 - added exclusion feature and reusable file manipulation functions in cop
 
 Installation:
 
-currently no .exe exists for this program but source code can be used if python and 
-tkinter are installed on your machine.
+bin folder contains .exe for windows. simply click file_mover.exe to lunch program 
 
 Tested OS:
 -Linux
