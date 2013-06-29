@@ -236,14 +236,13 @@ class Program:
 
     
     def remove(self):
-        from copy import remove_files
         """initiates copying of files to new directory and deletion of copied files from source directory"""
 
         GUI.remove_button.grid_remove()
         GUI.continue_button.grid_remove()
         self.continues(True)
         
-        remove_files(self.files_list)
+        copy.remove_files(self.files_list)
 
         GUI.copied_files.insert(END,"%d files were removed from %s" % (self.files_moved, self.src))
         GUI.copied_files.see(END)
