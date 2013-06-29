@@ -75,11 +75,12 @@ class Program:
                 GUI.copied_files.insert(END,"%d files, %s will be copied and moved."
                  % (len(self.files_list),copy.get_size(files_in_source)))
                 GUI.copied_files.insert(END,"Would you like to remove from source, also?") 
-                #prevents multiple clear, remove, continue buttons from being created
+                
             else:
                 GUI.copied_files.insert(END,'Files already exist in destination.')
                 return
 
+            #prevents multiple clear, remove, continue buttons from being created
             if self.run:
                 return
 
@@ -92,23 +93,6 @@ class Program:
             self.run = True
             self.cleared = False
 
-        #iterates through type_list to append file types that are to be excluded to the exclusion list
-        for types in self.type_list:
-            if types.startswith("-"):
-                file_type = types[1::]
-                self.exclusion_list.append(file_type)
-
-        if self.run:
-            return
-
-        #checks if listbox is cleared. If not cleared, creates clear button 
-        if self.cleared:
-            GUI.clear_button.grid(row=0,column=1,sticky=W)
-
-        GUI.continue_button.grid(row=0,column=2,sticky=W)
-        GUI.remove_button.grid(row=0,column=3,sticky=W)
-        self.run = True
-        self.cleared = False
     
     def continues(self,removed = False):
 
