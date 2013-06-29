@@ -8,7 +8,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 includes = ['atexit']
-packages = ['Tkinter', 'tkFileDialog','sqlite3','shutil']
+packages = ['Tkinter', 'tkFileDialog','sqlite3']
 base = None
 if sys.platform == 'win32':
     base = 'Win32Gui'
