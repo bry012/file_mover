@@ -20,8 +20,10 @@ This program also creates a database on the user's machine
 named "file_mover.db.
 
 Version info:
-v. 0.8 - added exclusion feature and reusable file manipulation functions in copy.py
-
+v. 0.8  
+	-added exclusion feature and reusable file manipulation functions in copy.py
+	-added windows .exe
+	-can now just move files from current directory
 Installation:
 
 bin folder contains .exe for windows. simply click file_mover.exe to lunch program 

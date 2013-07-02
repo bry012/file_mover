@@ -66,8 +66,8 @@ class Program:
 
             #walks source directory and destination directory, checks for duplicate files and assigns a list without
             #duplicates to files_in_source
-            files_in_source = copy.check_for_duplicates(copy.walk_dir(self.src,self.type_list,self.exclusion_list),\
-                                                   copy.walk_dir(self.dst,self.type_list,self.exclusion_list),GUI.copied_files,END)
+            files_in_source = copy.check_for_duplicates(copy.walk_dir(self.src,self.type_list,self.exclusion_list,GUI.current.var.get()),\
+                                                   copy.walk_dir(self.dst,self.type_list,self.exclusion_list,GUI.current.var.get()),GUI.copied_files,END)
             self.files_list = files_in_source
             
             #inform the user that file exist and exit the program
@@ -121,14 +121,14 @@ class Program:
 
     
     def remove(self):
-        from copy import remove_files
+        
         """initiates copying of files to new directory and deletion of copied files from source directory"""
 
         GUI.remove_button.grid_remove()
         GUI.continue_button.grid_remove()
         self.continues(True)
         
-        remove_files(self.files_list)
+        copy.remove_files(self.files_list)
 
         GUI.copied_files.insert(END,"%d files were removed from %s" % (self.files_moved, self.src))
         GUI.copied_files.see(END)
@@ -148,6 +148,9 @@ class Window:
     file_src = Entry(srcframe,insertbackground="#33CCCC",bg="black",fg="#33CCCC")
     file_dst = Entry(srcframe,insertbackground="#33CCCC",bg="black",fg="#33CCCC")
     file_type = Entry(srcframe,insertbackground="#33CCCC",bg="black",fg="#33CCCC")
+    var = IntVar()
+    current = Checkbutton(buttonframe, text="Current", variable=var)
+    current.var = var
     scrollbar = Scrollbar(listframe)
     copied_files = Listbox(listframe, width = 63,bg="black",fg="#33CCCC", yscrollcommand=scrollbar.set)
     menubar = Menu(root)
@@ -242,7 +245,7 @@ class Window:
     def create(self):
 
         """constructs main file mover window. Self is only argument"""
-
+        self.buttonframe.config(bg="black")
         self.submit.config(command = self.submit_button,fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
         self.clear_button.config(bg="black",fg="#33CCCC", command = file_mover.clear,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
         self.continue_button.config(bg="black",fg="#33CCCC",  command = file_mover.continues,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
@@ -261,6 +264,7 @@ class Window:
         self.file_dst.grid(row=1,column=1,sticky=W+E)
         self.file_type.grid(row=2,column=1,sticky=W+E)
         self.submit.grid(row=0,sticky=W)
+        self.current.grid(row=0,column=4)
 
         # get folder buttons 
         self.open_.config(command = lambda:self.getDirSrc(self.file_src),fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
@@ -272,6 +276,7 @@ class Window:
         self.file_dst.config(highlightbackground="#33CCCC")
         self.file_type.config(highlightbackground="#33CCCC") 
         self.copied_files.grid(row=0,column=0,sticky=W)
+        self.current.config(fg="#33CCCC", bg="black",highlightbackground="black",activebackground="#33CCCC",activeforeground="black", height=1)
         self.copied_files.config(yscrollcommand=self.scrollbar.set,highlightbackground="#33CCCC")
         self.scrollbar.config(command=self.copied_files.yview,bg="#33CCCC",troughcolor="black")
         self.scrollbar.grid(row=0,column=1,sticky=N+S)

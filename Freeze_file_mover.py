@@ -12,7 +12,7 @@ class Copy(object):
     """docstring for copy"""
     def __init__(self):
         super(Copy, self).__init__()
-        
+
     def copy_files(self,src,dst,files_list):
             """Copies files from source directory to destination directory. Returns number of files moved"""
             files_moved = len(files_list)
@@ -26,13 +26,13 @@ class Copy(object):
                 shutil.copyfile(files,dst_root+"/"+dst_file)
             return files_moved
 
-    def walk_dir(self,src,type_list=[],exclusion_list=[]):
+    def walk_dir(self,src,type_list=[],exclusion_list=[],current_dir_only = 0):
         """walks source directory and filters files based on whether they are included in 
            the type_list or exclusion_list. Returns list of desired files"""
-        desired_files = []
 
+        desired_files = []
+        current_dir_only = current_dir_only
         for root,dirs,files in os.walk(src):
-            
             for filed in files:
                 file_path = os.path.join(root, filed)
                 (files,extension) = os.path.splitext(filed)
@@ -42,8 +42,11 @@ class Copy(object):
                 
                 elif extension not in exclusion_list and exclusion_list:
                     desired_files.append(root+"/"+filed)
-                
+            if current_dir_only == 1:
+                break
+
         return desired_files
+
 
     def remove_files(self,files_list):
             """removes files and empty directories in list of files passed to function"""
@@ -98,13 +101,13 @@ class Copy(object):
                 (dstRoot,dstFile_name) = os.path.split(files_in_dst)
                 if dstFile_name == srcFile_name:
                     #informs user of duplicate file 
-                    guiObject.insert(END,'%s exists in destination.'%srcFile_name)
-                    print files in src_files
+                    guiObject.insert(END,'%s exists in destination'%srcFile_name)
                     try:
                         src_files.remove(files)
                     except:
                         print files
         return src_files
+
 
 copy = Copy()
 
@@ -165,8 +168,8 @@ class Program:
 
             #walks source directory and destination directory, checks for duplicate files and assigns a list without
             #duplicates to files_in_source
-            files_in_source = copy.check_for_duplicates(copy.walk_dir(self.src,self.type_list,self.exclusion_list),\
-                                                   copy.walk_dir(self.dst,self.type_list,self.exclusion_list),GUI.copied_files,END)
+            files_in_source = copy.check_for_duplicates(copy.walk_dir(self.src,self.type_list,self.exclusion_list,GUI.current.var.get()),\
+                                                   copy.walk_dir(self.dst,self.type_list,self.exclusion_list,GUI.current.var.get()),GUI.copied_files,END)
             self.files_list = files_in_source
             
             #inform the user that file exist and exit the program
@@ -174,11 +177,12 @@ class Program:
                 GUI.copied_files.insert(END,"%d files, %s will be copied and moved."
                  % (len(self.files_list),copy.get_size(files_in_source)))
                 GUI.copied_files.insert(END,"Would you like to remove from source, also?") 
-                #prevents multiple clear, remove, continue buttons from being created
+                
             else:
                 GUI.copied_files.insert(END,'Files already exist in destination.')
                 return
 
+            #prevents multiple clear, remove, continue buttons from being created
             if self.run:
                 return
 
@@ -191,23 +195,6 @@ class Program:
             self.run = True
             self.cleared = False
 
-        #iterates through type_list to append file types that are to be excluded to the exclusion list
-        for types in self.type_list:
-            if types.startswith("-"):
-                file_type = types[1::]
-                self.exclusion_list.append(file_type)
-
-        if self.run:
-            return
-
-        #checks if listbox is cleared. If not cleared, creates clear button 
-        if self.cleared:
-            GUI.clear_button.grid(row=0,column=1,sticky=W)
-
-        GUI.continue_button.grid(row=0,column=2,sticky=W)
-        GUI.remove_button.grid(row=0,column=3,sticky=W)
-        self.run = True
-        self.cleared = False
     
     def continues(self,removed = False):
 
@@ -236,6 +223,7 @@ class Program:
 
     
     def remove(self):
+        
         """initiates copying of files to new directory and deletion of copied files from source directory"""
 
         GUI.remove_button.grid_remove()
@@ -262,6 +250,9 @@ class Window:
     file_src = Entry(srcframe,insertbackground="#33CCCC",bg="black",fg="#33CCCC")
     file_dst = Entry(srcframe,insertbackground="#33CCCC",bg="black",fg="#33CCCC")
     file_type = Entry(srcframe,insertbackground="#33CCCC",bg="black",fg="#33CCCC")
+    var = IntVar()
+    current = Checkbutton(buttonframe, text="Current", variable=var)
+    current.var = var
     scrollbar = Scrollbar(listframe)
     copied_files = Listbox(listframe, width = 63,bg="black",fg="#33CCCC", yscrollcommand=scrollbar.set)
     menubar = Menu(root)
@@ -356,7 +347,7 @@ class Window:
     def create(self):
 
         """constructs main file mover window. Self is only argument"""
-
+        self.buttonframe.config(bg="black")
         self.submit.config(command = self.submit_button,fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
         self.clear_button.config(bg="black",fg="#33CCCC", command = file_mover.clear,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
         self.continue_button.config(bg="black",fg="#33CCCC",  command = file_mover.continues,highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
@@ -375,6 +366,7 @@ class Window:
         self.file_dst.grid(row=1,column=1,sticky=W+E)
         self.file_type.grid(row=2,column=1,sticky=W+E)
         self.submit.grid(row=0,sticky=W)
+        self.current.grid(row=0,column=4)
 
         # get folder buttons 
         self.open_.config(command = lambda:self.getDirSrc(self.file_src),fg="#33CCCC", bg="black",highlightbackground="#33CCCC",activebackground="#33CCCC",activeforeground="white")
@@ -386,6 +378,7 @@ class Window:
         self.file_dst.config(highlightbackground="#33CCCC")
         self.file_type.config(highlightbackground="#33CCCC") 
         self.copied_files.grid(row=0,column=0,sticky=W)
+        self.current.config(fg="#33CCCC", bg="black",highlightbackground="black",activebackground="#33CCCC",activeforeground="black", height=1)
         self.copied_files.config(yscrollcommand=self.scrollbar.set,highlightbackground="#33CCCC")
         self.scrollbar.config(command=self.copied_files.yview,bg="#33CCCC",troughcolor="black")
         self.scrollbar.grid(row=0,column=1,sticky=N+S)

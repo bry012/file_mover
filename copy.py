@@ -13,13 +13,13 @@ def copy_files(src,dst,files_list):
             shutil.copyfile(files,dst_root+"/"+dst_file)
         return files_moved
 
-def walk_dir(src,type_list=[],exclusion_list=[]):
+def walk_dir(src,type_list=[],exclusion_list=[],current_dir_only = 0):
     """walks source directory and filters files based on whether they are included in 
        the type_list or exclusion_list. Returns list of desired files"""
-    desired_files = []
 
+    desired_files = []
+    current_dir_only = current_dir_only
     for root,dirs,files in os.walk(src):
-        
         for filed in files:
             file_path = os.path.join(root, filed)
             (files,extension) = os.path.splitext(filed)
@@ -29,8 +29,11 @@ def walk_dir(src,type_list=[],exclusion_list=[]):
             
             elif extension not in exclusion_list and exclusion_list:
                 desired_files.append(root+"/"+filed)
-            
+        if current_dir_only == 1:
+            break
+
     return desired_files
+
 
 def remove_files(files_list):
         """removes files and empty directories in list of files passed to function"""
@@ -86,7 +89,6 @@ def check_for_duplicates(src_list,dst_list,guiObject,END):
             if dstFile_name == srcFile_name:
                 #informs user of duplicate file 
                 guiObject.insert(END,'%s exists in destination'%srcFile_name)
-                print files in src_files
                 try:
                     src_files.remove(files)
                 except:
